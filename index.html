@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<!--
+Break-even Point Calculator Program
+© 2024 Kelvin Charles Cancio
+Author: Kelvin Charles Cancio
+Created: 26/10/2024
+Permission is granted to use, modify, and distribute this code for educational and non-commercial purposes.
+-->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/css/styles.css">
+    <title>Break-even Calculator</title>
+    <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
+    <script defer src="https://pyscript.net/latest/pyscript.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to bottom, #cd853f, white);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 600px;
+            text-align: center;
+            max-width: 90%;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+
+        input[type="number"], input[type="submit"] {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        input[type="number"] {
+            background-color: wheat;
+        }
+
+        input[type="number"]:focus {
+            border-color: #66b3ff;
+            background-color: wheat;
+        }
+
+        #computeBtn {
+            width: 100%; 
+            height: 50px; 
+            background-color: sandybrown;  
+            color: white; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer;  
+            font-size: 18px;  
+            transition: background-color 0.3s ease; 
+        }
+
+        #computeBtn:hover {
+            background-color: sienna; 
+        }
+
+        .results-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        .result-box {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            width: 100%;
+            font-size: 18px;
+            color: #333;
+        }
+
+        .instruction {
+            margin-top: 20px;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .chart {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            width: 100%;
+            position: relative;
+        }
+
+        .bar {
+            width: 25%;
+            background-color: sandybrown;
+            transition: height 0.3s;
+            position: relative;
+        }
+
+        .bar-label {
+            position: absolute;
+            bottom: 100%;
+            text-align: center;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .variable-cost {
+            background-color: #76c7c0; 
+        }
+
+        .fixed-cost {
+            background-color: #ffcc00; 
+        }
+
+        .revenue {
+            background-color: #4CAF50; 
+        }
+
+        
+        .bar-value {
+            height: 0; 
+            transition: height 0.5s ease; 
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Break-even Calculator</h1>
+        <form id="breakEvenForm">
+            <input type="number" id="fixedCost" placeholder="Enter Fixed Cost" min="0" step="0.01" required>
+            <input type="number" id="variableCost" placeholder="Enter Variable Cost per Unit" min="0" step="0.01" required>
+            <input type="number" id="sellingPrice" placeholder="Enter Selling Price per Unit" min="0" step="0.01" required>
+            <button type="button" id="computeBtn">Compute</button>
+        </form>
+
+        <div class="results-container">
+            <div class="result-box" id="resultBreakEven">
+                <strong>Break-even Point:</strong><br>
+            </div>
+        </div>
+
+        <div class="chart" id="chartContainer">
+            <div class="bar fixed-cost" id="fixedCostBar">
+                <div class="bar-value" id="fixedCostValue"></div>
+                <div class="bar-label" id="fixedCostLabel"></div>
+            </div>
+            <div class="bar variable-cost" id="variableCostBar">
+                <div class="bar-value" id="variableCostValue"></div>
+                <div class="bar-label" id="variableCostLabel"></div>
+            </div>
+            <div class="bar revenue" id="revenueBar">
+                <div class="bar-value" id="revenueValue"></div>
+                <div class="bar-label" id="revenueLabel"></div>
+            </div>
+        </div>
+    </div>
+
+    <py-script>
+        from pyscript import Element
+        
+        # Function to calculate the break-even point when the compute button is clicked
+        def calculate_break_even(event):
+            try:
+                # Get the values from the input fields
+                fixed_cost_input = Element("fixedCost").element.value
+                variable_cost_input = Element("variableCost").element.value
+                selling_price_input = Element("sellingPrice").element.value
+    
+                # Check if any of the inputs are empty
+                if fixed_cost_input == "" or variable_cost_input == "" or selling_price_input == "":
+                    Element("resultBreakEven").element.innerHTML = "Please fill in all fields."
+                    return
+    
+                # Convert inputs to floats
+                fixed_cost = float(fixed_cost_input)
+                variable_cost = float(variable_cost_input)
+                selling_price = float(selling_price_input)
+    
+                # Check if the selling price is greater than the variable cost per unit
+                if selling_price <= variable_cost:
+                    Element("resultBreakEven").element.innerHTML = "Selling price must be greater than the variable cost per unit."
+                    return
+    
+                # Calculate the break-even point in units
+                break_even_units = fixed_cost / (selling_price - variable_cost)
+    
+                Element("resultBreakEven").element.innerHTML = f"""
+                    To break even, you need to sell {break_even_units:.2f} units.
+                """
+    
+                # Calculate total costs and revenue for visualization
+                total_cost = fixed_cost + (variable_cost * break_even_units)
+                total_revenue = selling_price * break_even_units
+    
+                # Set bar heights for visualization
+                max_height = 300
+                fixed_cost_height = (fixed_cost / total_revenue) * max_height
+                variable_cost_height = (variable_cost * break_even_units / total_revenue) * max_height
+                revenue_height = (total_revenue / total_revenue) * max_height
+    
+                # Set the bars
+                Element("fixedCostValue").element.style.height = f"{fixed_cost_height}px"
+                Element("variableCostValue").element.style.height = f"{variable_cost_height}px"
+                Element("revenueValue").element.style.height = f"{revenue_height}px"
+    
+                # update bar labels
+                Element("fixedCostLabel").element.innerHTML = f"Fixed Cost: {fixed_cost:.2f}"
+                Element("variableCostLabel").element.innerHTML = f"Variable Cost: {variable_cost * break_even_units:.2f}"
+                Element("revenueLabel").element.innerHTML = f"Revenue: {total_revenue:.2f}"
+    
+            except ValueError as e:
+                Element("resultBreakEven").element.innerHTML = str(e)
+    
+        Element("computeBtn").element.onclick = calculate_break_even
+    </py-script>
+    
+</body>
+</html>
+
+
+
+
+
+
